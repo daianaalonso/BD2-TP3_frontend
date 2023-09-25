@@ -1,0 +1,75 @@
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import Producto from "../domain/Producto";
+import "./Productos.css";
+
+Productos.propTypes = {
+  selectedProductos: PropTypes.array,
+  setSelectedProductos: PropTypes.func,
+};
+
+export default function Productos({ selectedProductos, setSelectedProductos }) {
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/producto")
+      .then((response) => response.json())
+      .then((json) => {
+        const productos = json.map(
+          (item) =>
+            new Producto(
+              item.id,
+              item.codigo,
+              item.descripcion,
+              item.categoria,
+              item.precio,
+              item.marca
+            )
+        );
+        setProductos(productos);
+      })
+      .catch((error) => console.error("Error al cargar productos:", error));
+  }, []);
+
+  const handleProductoSelect = (idProducto) => {
+    if (selectedProductos.includes(idProducto)) {
+      setSelectedProductos(selectedProductos.filter((id) => id !== idProducto));
+    } else {
+      setSelectedProductos([...selectedProductos, idProducto]);
+    }
+  };
+
+  return (
+    <div>
+      <table className="productos">
+        <thead>
+          <tr>
+            <th>Descripción</th>
+            <th>Marca</th>
+            <th>Precio</th>
+            <th>Agregar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productos.map((p) => {
+            return (
+              <tr key={p.id}>
+                <td>{p.descripcion}</td>
+                <td>{p.marca.nombre}</td>
+                <td>${p.precio}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    value={p.id}
+                    checked={selectedProductos.includes(p.id)}
+                    onChange={() => handleProductoSelect(p.id)}
+                  />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
