@@ -13,29 +13,31 @@ export default function BotonMonto({ selectedProductos, selectedTarjeta }) {
 
   console.log(selectedProductos, selectedTarjeta);
 
-  const handleClick = (e) => {
+  const fetchMonto = async () => {
     setErrorMessage("");
     setMonto(null);
 
-    e.preventDefault();
+    try {
+      const response = await fetch(
+        `http://localhost:8080/venta?productos=${selectedProductos.join(
+          ","
+        )}&idTarjeta=${selectedTarjeta}`
+      );
+      if (response.ok) {
+        const json = await response.json();
+        setMonto(json);
+      } else {
+        const json = await response.json();
+        setErrorMessage(json.error);
+      }
+    } catch (error) {
+      console.error("Error al calcular el monto.", error);
+    }
+  };
 
-    fetch(
-      `http://localhost:8080/venta?productos=${selectedProductos.join(
-        ","
-      )}&idTarjeta=${selectedTarjeta}`
-    )
-      .then((response) => {
-        if (response.ok) {
-          return response.json().then((data) => {
-            setMonto(data);
-          });
-        } else {
-          return response.json().then((data) => {
-            setErrorMessage(data.error);
-          });
-        }
-      })
-      .catch((error) => console.error("Error al calcular el monto.", error));
+  const handleClick = (e) => {
+    e.preventDefault();
+    fetchMonto();
   };
 
   return (

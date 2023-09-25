@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import Producto from "../domain/Producto";
 import "./Productos.css";
 
 Productos.propTypes = {
@@ -12,23 +11,20 @@ export default function Productos({ selectedProductos, setSelectedProductos }) {
   const [productos, setProductos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/producto")
-      .then((response) => response.json())
-      .then((json) => {
-        const productos = json.map(
-          (item) =>
-            new Producto(
-              item.id,
-              item.codigo,
-              item.descripcion,
-              item.categoria,
-              item.precio,
-              item.marca
-            )
-        );
-        setProductos(productos);
-      })
-      .catch((error) => console.error("Error al cargar productos:", error));
+    const fetchProducto = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/producto");
+        if (response.ok) {
+          const json = await response.json();
+          setProductos(json);
+        } else {
+          console.error("Error al cargar los productos");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchProducto();
   }, []);
 
   const handleProductoSelect = (idProducto) => {

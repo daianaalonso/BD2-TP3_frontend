@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Tarjeta from "../domain/Tarjeta";
 import "./Tarjetas.css";
 import PropTypes from "prop-types";
 
@@ -12,15 +11,20 @@ export default function Tarjetas({ selectedTarjeta, setSelectedTarjeta }) {
   const [tarjetas, setTarjetas] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/cliente?id=1")
-      .then((response) => response.json())
-      .then((json) => {
-        const tarjetas = json.map((item) => new Tarjeta(item.id, item.nombre));
-        setTarjetas(tarjetas);
-      })
-      .catch((error) =>
-        console.error("Error al cargar las tarjetas del cliente:", error)
-      );
+    const fetchTarjeta = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/cliente?id=1");
+        if (response.ok) {
+          const json = await response.json();
+          setTarjetas(json);
+        } else {
+          console.error("Error al cargar las tarjetas del cliente");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchTarjeta();
   }, []);
 
   const handleTarjetaSelect = (idTarjeta) => {

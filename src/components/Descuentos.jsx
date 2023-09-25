@@ -5,12 +5,20 @@ export default function Descuentos() {
   const [descuentos, setDescuentos] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/promocion")
-      .then((response) => response.json())
-      .then((json) => setDescuentos(json))
-      .catch((error) =>
-        console.error("Error al cargar las promociones:", error)
-      );
+    const fetchDescuentos = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/promocion");
+        if (response.ok) {
+          const json = await response.json();
+          setDescuentos(json);
+        } else {
+          console.error("Error al cargar las promociones");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchDescuentos();
   }, []);
 
   return (

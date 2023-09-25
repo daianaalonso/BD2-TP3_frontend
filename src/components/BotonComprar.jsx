@@ -12,7 +12,42 @@ export default function BotonComprar({ selectedProductos, selectedTarjeta }) {
 
   console.log(selectedProductos, selectedTarjeta);
 
+  const fetchCompra = async () => {
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/venta?idCliente=1&idTarjeta=${selectedTarjeta}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+          body: JSON.stringify(selectedProductos),
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        setSuccessMessage(json.result);
+        console.log("Compra exitosa");
+      } else {
+        const json = await response.json();
+        setErrorMessage(json.error);
+        console.error("Error en la compra.");
+      }
+    } catch (error) {
+      console.error("Error en la solicitud POST:", error);
+    }
+  };
+
   const handleComprarClick = (e) => {
+    e.preventDefault();
+    fetchCompra();
+  };
+
+  /*const handleComprarClick = (e) => {
     setSuccessMessage("");
     setErrorMessage("");
 
@@ -44,7 +79,7 @@ export default function BotonComprar({ selectedProductos, selectedTarjeta }) {
       .catch((error) => {
         console.error("Error en la solicitud POST:", error);
       });
-  };
+  };*/
 
   return (
     <div>
